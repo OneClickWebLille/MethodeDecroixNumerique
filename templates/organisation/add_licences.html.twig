@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Acheter des licences{% endblock %}
+
+{% block body %}
+    {% include 'include/navbar.html.twig' %}
+
+    <div class="container mt-5">
+        <h1 class="mb-4">Acheter des licences</h1>
+
+        <form action="{{ path('app_acheter_licences') }}" method="POST" data-turbo="false">
+            <div class="mb-3">
+                <label for="nb_licences" class="form-label">Nombre de licences</label>
+                <input type="number" class="form-control" id="nb_licences" name="nb_licences" min="1" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Acheter</button>
+        </form>
+    </div>
+{% endblock %}

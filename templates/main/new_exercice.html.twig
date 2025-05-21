@@ -1,0 +1,354 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Exercice{% endblock %}
+
+{% block body %}
+{% for message in app.flashes('success') %}
+    <div class="alert alert-success">
+        {{ message }}
+    </div>
+{% endfor %}
+    {% include 'include/navbar.html.twig' %}
+
+    <div class="container exercise-creator">
+        <h1 class="mb-4">Créateur d'exercice</h1>
+
+        {# Partie configuration de l'exercice #}
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h2 class="h5 mb-0">Configuration de l'exercice</h2>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="exercise-title">Titre de l'exercice</label>
+                    <input type="text" class="form-control" id="exercise-title" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="exercise-description">Instructions</label>
+                    <textarea class="form-control" id="exercise-description" name="description" rows="3"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="type-order">Ordre des types (glisser-déposer)</label>
+            <ul id="type-order-list" class="list-group sortable-types">
+                {% for type in blocs %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center"
+                        data-type-id="{{ type.owner.id }}">
+                        {{ type.owner.nom }}
+                        <span class="badge bg-secondary">ID: {{ type.owner.id }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <br><br>
+
+        {# Partie sélection des blocs #}
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h2 class="h5 mb-0">Sélection des blocs</h2>
+            </div>
+            <div class="card-body" id="bloc-selection-container">
+                {% for type in blocs %}
+                    <div class="type-group mb-4 p-3 border rounded" data-type-id="{{ type.owner.id }}">
+                        <h3 class="h5 mb-3">
+                            <span class="badge bg-secondary">{{ type.owner.nom }}</span>
+                            <small class="text-muted">(Type ID: {{ type.owner.id }})</small>
+                        </h3>
+
+                        <div class="form-group">
+                            <label>Sélectionnez les blocs valides pour ce type:</label>
+                            <div class="row">
+                                {% for bloc in type %}
+                                    <div class="col-md-4 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input bloc-checkbox"
+                                                   type="checkbox"
+                                                   id="bloc-{{ bloc.id }}"
+                                                   data-type-id="{{ type.owner.id }}"
+                                                   value="{{ bloc.id }}">
+                                            <label class="form-check-label" for="bloc-{{ bloc.id }}">
+                                                {{ bloc.valeur }}
+                                                <small class="text-muted">(ID: {{ bloc.id }})</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        {# Partie configuration des solutions #}
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h2 class="h5 mb-0">Configuration des solutions</h2>
+            </div>
+            <div class="card-body">
+                <div id="solutions-container">
+                    {# Les solutions seront ajoutées dynamiquement ici #}
+                </div>
+                <button type="button" class="btn btn-outline-primary mt-3" id="add-solution">
+                    <i class="fas fa-plus"></i> Ajouter une solution
+                </button>
+            </div>
+        </div>
+
+
+        {# Prévisualisation JSON #}
+        <div class="card mb-4 shadow-sm d-none">
+            <div class="card-header bg-info text-white">
+                <h2 class="h5 mb-0">Prévisualisation JSON</h2>
+            </div>
+            <div class="card-body">
+                <pre id="json-preview" class="p-3 bg-light rounded">{}</pre>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success btn-lg mb-5" onclick="sendForm()">
+            <i class="fas fa-save"></i> Enregistrer l'exercice
+        </button>
+    </div>
+
+    {# Template pour une nouvelle solution (utilisé par JavaScript) #}
+    <script type="text/template" id="solution-template">
+        <div class="solution-group mb-3 p-3 border rounded">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h4 class="h6 mb-0">Solution <span class="solution-number"></span></h4>
+                <button type="button" class="btn btn-sm btn-outline-danger remove-solution">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="solution-inputs">
+                {# Les champs seront ajoutés dynamiquement #}
+            </div>
+        </div>
+    </script>
+
+    {# JavaScript pour gérer la logique #}
+    <script>
+        function loadSortable(callback) {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js';
+            script.onload = callback;
+            document.head.appendChild(script);
+        }
+
+        const blocMap = {};
+        document.addEventListener('turbo:load', function() {
+            {% for type in blocs %}
+            blocMap[{{ type.owner.id }}] = document.querySelector('.type-group[data-type-id="{{ type.owner.id }}"]').cloneNode(true);
+            {% endfor %}
+
+            loadSortable(function () {
+                new Sortable(document.getElementById('type-order-list'), {
+                    animation: 150,
+                    onEnd: () => {
+                        renderBlocOrder();
+                        updateJsonPreview();
+                    }
+                });
+            });
+
+            // Adapte updateJsonPreview pour inclure l'ordre
+            const originalUpdateJsonPreview = updateJsonPreview;
+            updateJsonPreview = function() {
+                originalUpdateJsonPreview();
+
+                const typeOrder = Array.from(document.querySelectorAll('#type-order-list li'))
+                    .map(li => parseInt(li.dataset.typeId));
+
+                const json = JSON.parse(document.getElementById('json-preview').textContent);
+                json.typeOrder = typeOrder;
+
+                document.getElementById('json-preview').textContent = JSON.stringify(json, null, 2);
+            };
+
+
+
+            const solutionsContainer = document.getElementById('solutions-container');
+            const addSolutionBtn = document.getElementById('add-solution');
+            const jsonPreview = document.getElementById('json-preview');
+            let solutionCount = 0;
+
+            // Ajouter une nouvelle solution
+            addSolutionBtn.addEventListener('click', function() {
+                solutionCount++;
+                const template = document.getElementById('solution-template').innerHTML;
+                const solutionHtml = template.replace('solution-number', solutionCount);
+
+                const div = document.createElement('div');
+                div.innerHTML = solutionHtml;
+                div.classList.add('solution-item');
+                div.dataset.solutionId = solutionCount;
+
+                solutionsContainer.appendChild(div);
+
+                // Ajouter les champs pour chaque type
+                const solutionInputs = div.querySelector('.solution-inputs');
+                const orderedTypeIds = Array.from(document.querySelectorAll('#type-order-list li'))
+                    .map(li => ({ id: parseInt(li.dataset.typeId), nom: li.textContent.trim() }));
+
+                orderedTypeIds.forEach(type => {
+                    addTypeField(solutionInputs, type.id, type.nom);
+                });
+
+                updateJsonPreview();
+            });
+
+            // Ajouter un champ pour un type dans une solution
+            function addTypeField(container, typeId, typeName) {
+                const div = document.createElement('div');
+                div.className = 'form-group mb-2';
+
+                const label = document.createElement('label');
+                label.textContent = typeName + ':';
+                label.className = 'form-label';
+
+                const select = document.createElement('select');
+                select.className = 'form-select solution-select';
+                select.dataset.typeId = typeId;
+                select.name = `solutions[${container.closest('.solution-item').dataset.solutionId}][${typeId}]`;
+
+                // Options seront ajoutées dynamiquement en fonction des cases cochées
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = '-- Sélectionnez un bloc --';
+                select.appendChild(option);
+
+                div.appendChild(label);
+                div.appendChild(select);
+                container.appendChild(div);
+
+                // Mettre à jour les options quand les checkboxes changent
+                updateSelectOptions(select);
+            }
+
+            // Mettre à jour les options des selects
+            function updateSelectOptions(select) {
+                const typeId = select.dataset.typeId;
+                const currentValue = select.value;
+
+                // Vider le select sauf la première option
+                while (select.options.length > 1) {
+                    select.remove(1);
+                }
+
+                // Ajouter les options pour les blocs cochés de ce type
+                document.querySelectorAll(`.bloc-checkbox[data-type-id="${typeId}"]:checked`).forEach(checkbox => {
+                    const option = document.createElement('option');
+                    option.value = checkbox.value;
+                    option.textContent = checkbox.nextElementSibling.textContent.trim();
+                    select.appendChild(option);
+                });
+
+                // Réinitialiser la valeur si l'option n'existe plus
+                if (currentValue && !Array.from(select.options).some(opt => opt.value === currentValue)) {
+                    select.value = '';
+                }
+            }
+
+            // Mettre à jour la prévisualisation JSON
+            function updateJsonPreview() {
+                const inputData = {};
+                const solutionData = {};
+
+                // Récupérer les blocs sélectionnés par type
+                {% for type in blocs %}
+                inputData[{{ type.owner.id }}] = Array.from(
+                    document.querySelectorAll(`.bloc-checkbox[data-type-id="{{ type.owner.id }}"]:checked`)
+                ).map(checkbox => parseInt(checkbox.value));
+                {% endfor %}
+
+                // Récupérer les solutions
+                document.querySelectorAll('.solution-item').forEach(solution => {
+                    const solutionId = solution.dataset.solutionId;
+                    solutionData[solutionId] = {};
+
+                    solution.querySelectorAll('.solution-select').forEach(select => {
+                        if (select.value) {
+                            solutionData[solutionId][select.dataset.typeId] = parseInt(select.value);
+                        }
+                    });
+                });
+
+                // Afficher le JSON formaté
+                jsonPreview.textContent = JSON.stringify({
+                    input: inputData,
+                    solutions: solutionData
+                }, null, 2);
+            }
+
+            // Écouter les changements sur les checkboxes et selects
+            document.addEventListener('change', function(e) {
+                if (e.target.classList.contains('bloc-checkbox')) {
+                    // Mettre à jour tous les selects correspondants
+                    document.querySelectorAll(`.solution-select[data-type-id="${e.target.dataset.typeId}"]`).forEach(select => {
+                        updateSelectOptions(select);
+                    });
+                }
+
+                if (e.target.classList.contains('solution-select')) {
+                    updateJsonPreview();
+                }
+            });
+
+            // Gérer la suppression d'une solution
+            solutionsContainer.addEventListener('click', function(e) {
+                if (e.target.classList.contains('remove-solution') || e.target.closest('.remove-solution')) {
+                    e.target.closest('.solution-item').remove();
+                    updateJsonPreview();
+                }
+            });
+        });
+
+        // sendForm
+        function sendForm() {
+            const jsonPreview = document.getElementById('json-preview');
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ path('app_save_exercice') }}';
+            form.style.display = 'none';
+
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'json';
+            input.value = jsonPreview.textContent;
+            form.appendChild(input);
+
+            const title = document.getElementById('exercise-title');
+            const inputTitle = document.createElement('input');
+            inputTitle.type = 'hidden';
+            inputTitle.name = 'nom';
+            inputTitle.value = title.value;
+            form.appendChild(inputTitle);
+
+            const description = document.getElementById('exercise-description');
+            const inputDescription = document.createElement('input');
+            inputDescription.type = 'hidden';
+            inputDescription.name = 'description';
+            inputDescription.value = description.value;
+            form.appendChild(inputDescription);
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        function renderBlocOrder() {
+            const container = document.getElementById('bloc-selection-container');
+            container.innerHTML = '';
+
+            const orderedTypeIds = Array.from(document.querySelectorAll('#type-order-list li'))
+                .map(li => parseInt(li.dataset.typeId));
+
+            orderedTypeIds.forEach(typeId => {
+                const blocGroup = blocMap[typeId].cloneNode(true);
+                container.appendChild(blocGroup);
+            });
+        }
+    </script>
+{% endblock %}

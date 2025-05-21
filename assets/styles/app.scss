@@ -1,0 +1,69 @@
+@import "~bootstrap/scss/bootstrap";
+
+body {
+    background-color: #f9fafb;
+    font-size: 16px; // Taille de base du texte
+}
+
+.container-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+// Media queries
+@include media-breakpoint-up(sm) {
+    body {
+        background-color: #f9fafb;
+        font-size: 18px; // Augmente la taille du texte sur mobile
+    }
+    nav {
+        height: 200px;
+    }
+}
+
+@include media-breakpoint-up(md) {
+    body {
+        background-color: #f9fafb;
+        font-size: 30px; // Un peu plus grand pour tablette
+    }
+    nav {
+        height: 200px;
+    }
+}
+
+@include media-breakpoint-up(lg) {
+    body {
+        background-color: #f9fafb;
+        font-size: 22px; // Taille standard pour desktop
+    }
+    nav {
+        height: 100px;
+    }
+}
+
+@include media-breakpoint-up(xl) {
+    body {
+        background-color: #f9fafb;
+        font-size: 24px; // Texte encore plus grand sur très grands écrans
+    }
+}
+
+// Styles spécifiques pour les titres et liens
+h1 {
+    @include media-breakpoint-down(md) {
+        font-size: 24px; // Agrandir les titres sur mobile
+    }
+}
+
+h2 {
+    @include media-breakpoint-down(md) {
+        font-size: 20px;
+    }
+}
+
+.navbar-nav .nav-link {
+    @include media-breakpoint-down(md) {
+        font-size: 18px;
+    }
+}

@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des types{% endblock %}
+
+{% block body %}
+    {% include 'include/navbar.html.twig' %}
+
+    <div class="container mt-4">
+        <table class="table table-striped table-hover">
+            <thead class="thead-light">
+            <tr>
+                <th>Nom</th>
+                <th>Couleur</th>
+                {% if app.user and 'ROLE_ADMIN' in app.user.roles %}
+                    <th>Actions</th>
+                {% endif %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for type in types %}
+                <tr>
+                    <td>{{ type.nom }}</td>
+                    <td style="background-color: {{ type.color }};">{{ type.color }}</td>
+                    {% if app.user and 'ROLE_ADMIN' in app.user.roles %}
+                        <td>
+                            <a href="{{ path('app_edit_type', {'id': type.id}) }}" class="btn btn-primary btn-sm">Modifier</a>
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

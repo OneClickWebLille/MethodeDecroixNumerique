@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des exercices{% endblock %}
+
+{% block body %}
+    {% include 'include/navbar.html.twig' %}
+
+    <div class="container mt-4">
+        <table class="table table-striped table-hover">
+            <thead class="thead-light">
+            <tr>
+                <th>ID</th>
+                <th>Organisation</th>
+                <th>Nom</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for exercice in exercices %}
+                <tr>
+                    <td>{{ exercice.id }}</td>
+                    <td>{{ exercice.organisation.nom }}</td>
+                    <td>{{ exercice.nom }}</td>
+                    <td>
+                        <a href="{{ path('app_exercice', {'id': exercice.id}) }}" class="btn btn-primary">Voir</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

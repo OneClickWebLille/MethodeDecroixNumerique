@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des ustilisateurs{% endblock %}
+
+{% block body %}
+    {% include 'include/navbar.html.twig' %}
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between">
+            <h1>Liste des utilisateurs</h1>
+            <a class="nav-link" href="{{ path('app_add_user') }}">
+                <button>Ajouter un utilisateur</button>
+            </a>
+        </div>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Email</th>
+                <th>Rôle</th>
+                {% if app.user and 'ROLE_ADMIN' in app.user.roles %}
+                    <th>Organisation</th>
+                {% endif %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for user in users %}
+                {% if(app.user.id != user.id) %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.nom }}</td>
+                    <td>{{ user.prenom }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.roles | join(', ') }}</td>
+                    {% if app.user and 'ROLE_ADMIN' in app.user.roles %}
+                        <td>{{ user.organisation.nom }}</td>
+                    {% endif %}
+                </tr>
+                {% endif %}
+            {% else %}
+                <tr>
+                    <td colspan="5" class="text-center">Aucun utilisateur trouvé.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

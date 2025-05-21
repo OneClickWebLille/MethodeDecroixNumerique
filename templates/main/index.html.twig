@@ -1,0 +1,149 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block body %}
+
+{% for message in app.flashes('success') %}
+    <div class="alert alert-success">
+        {{ message }}
+    </div>
+{% endfor %}
+    {% include 'include/navbar.html.twig' %}
+
+    {% if app.user %}
+        {% if app.user.isVerified %}
+            {% if('ROLE_ADMIN') in app.user.roles %}
+                <h1>Administration</h1>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 20px; padding: 20px">
+                    <div class="card">
+                        <div class="card-header">Liste des utilisateurs</div>
+                        <div class="card-body">
+                            <p class="card-text">Vous pouvez gérer les utilisateurs ici.</p>
+                            <a href="{{ path('app_user_list') }}" style="text-decoration: none;">
+                                <button class="btn btn-primary">
+                                    Gérer les utilisateurs
+                                </button>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">Gestion des types</div>
+                        <div class="card-body">
+                            <p class="card-text">Vous pouvez gérer les types ici.</p>
+                            <a href="{{ path('app_new_type') }}" class="btn btn-primary">
+                                Créer un type
+                            </a>
+                            <a href="{{ path('app_list_type') }}" class="btn btn-primary">
+                                Gérer les types
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">Gestion des blocs</div>
+                        <div class="card-body">
+                            <p class="card-text">Vous pouvez gérer les blocs ici.</p>
+                            <a href="{{ path('app_new_bloc') }}" class="btn btn-primary">
+                                Créer un bloc
+                            </a>
+                            <a href="{{ path('app_list_bloc') }}" class="btn btn-primary">
+                                Gérer les blocs
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">Gestion des organisations</div>
+                        <div class="card-body">
+                            <p class="card-text">Vous pouvez gérer les organisations ici.</p>
+                            <a href="{{ path('app_new_organisation') }}" class="btn btn-primary">
+                                Créer une organisation
+                            </a>
+                            <a href="{{ path('app_list_organisation') }}" class="btn btn-primary">
+                                Gérer les organisations
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">Gestion des exercices</div>
+                        <div class="card-body">
+                            <p class="card-text">Vous pouvez gérer les exercices ici.</p>
+                            <a href="{{ path('app_admin_exercices') }}" class="btn btn-primary">
+                                Liste des exercices
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                {% if('ROLE_PROFESSEUR') in app.user.roles %}
+                    <h1>Mon espace professseur</h1>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 20px; padding: 20px">
+                        <div class="card">
+                            <div class="card-header">Créer un exercice</div>
+                            <div class="card-body">
+                                <p class="card-text">Vous pouvez créer un exercice ici.</p>
+                                <a href="{{ path('app_new_exercice') }}" class="btn btn-primary">
+                                    Créer un exercice
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">Créer un bloc</div>
+                            <div class="card-body">
+                                <p class="card-text">Vous pouvez gérer les blocs ici.</p>
+                                <a href="{{ path('app_new_bloc') }}" class="btn btn-primary">
+                                    Créer un bloc
+                                </a>
+                                <a href="{{ path('app_list_bloc') }}" class="btn btn-primary">
+                                    Voir la liste des blocs
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">Liste des exercices</div>
+                            <div class="card-body">
+                                <p class="card-text">Vous pouvez voir la liste des exercices ici.</p>
+                                <a href="{{ path('app_exercice_list') }}" class="btn btn-primary">
+                                    Voir la liste des exercices
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">Liste des types de blocs</div>
+                            <div class="card-body">
+                                <p class="card-text">Vous pouvez voir la liste types de blocs ici.</p>
+                                <a href="{{ path('app_list_type') }}" class="btn btn-primary">
+                                    Voir la liste des types
+                                </a>
+                            </div>
+                        </div>
+                {% else %}
+                <h1>Welcome, here's the list of exercices !</h1>
+                <div class="container-grid p-2">
+                    {% for exercice in exercices %}
+                        <div class="card">
+                            <div class="card-header">{{ exercice.nom }}</div>
+                            <div class="card-body">
+                                <p class="card-text">{{ exercice.description }}</p>
+                            </div>
+                            <div class="card-footer d-flex justify-content-center">
+                                <a class="btn btn-primary w-50" href="{{ path('app_exercice', {'id': exercice.id}) }}">
+                                    Voir
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            {% endif %}
+        {% else %}
+            <div class="alert alert-danger">
+                You need to confirm your email address.
+            </div>
+        {% endif %}
+    {% else %}
+        <h1>Bienvenue sur la méthode Decroix</h1>
+        <p>Pour accéder à votre espace personnel, veuillez vous connecter ou créer un compte.</p>
+    {% endif %}
+{% endblock %}

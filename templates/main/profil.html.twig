@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profil{% endblock %}
+
+{% block body %}
+
+    {% include 'include/navbar.html.twig' %}
+
+    <div class="container mt-5">
+        <h1 class="mb-4">Mon profil</h1>
+
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Informations personnelles</h5>
+                <p class="card-text"><strong>Nom :</strong> {{ app.user.nom }}</p>
+                <p class="card-text"><strong>Prénom :</strong> {{ app.user.prenom }}</p>
+                <p class="card-text"><strong>Email :</strong> {{ app.user.email }}</p>
+            </div>
+        </div>
+
+        {% if app.user.isVerified %}
+            <div class="alert alert-success" role="alert">
+                Votre compte est vérifié.
+            </div>
+        {% else %}
+            <div class="alert alert-danger" role="alert">
+                Votre compte n'est pas vérifié. Veuillez vérifier votre adresse e-mail.
+            </div>
+        {% endif %}
+{#        <div class="mb-3">#}
+{#            <a href="{{ path('app_profil_edit') }}" class="btn btn-primary">Modifier mes informations</a>#}
+{#        </div>#}
+    </div>
+
+{% endblock %}

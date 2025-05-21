@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier un type{% endblock %}
+
+{% block body %}
+    {% include 'include/navbar.html.twig' %}
+
+    <div class="container mt-4">
+        <h1>Modifier un type</h1>
+
+        {{ form_start(form) }}
+        {{ form_row(form.Nom, {'label': 'Nom du type'}) }}
+        {{ form_row(form.Color, {'label': 'Couleur'}) }}
+        <button class="btn btn-primary">Modifier</button>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

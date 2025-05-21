@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paiement Accepté{% endblock %}
+
+{% block body %}
+    {% include 'include/navbar.html.twig' %}
+
+    <style>
+        .payment-success-container {
+            text-align: center;
+            margin-top: 5rem;
+        }
+
+        .payment-success-title {
+            font-size: 2.5rem;
+            color: #2ecc71;
+            margin-bottom: 1rem;
+        }
+
+        .payment-success-message {
+            font-size: 1.2rem;
+            color: #34495e;
+        }
+    </style>
+
+    <div class="payment-success-container">
+        <h1 class="payment-success-title">Merci pour votre paiement !</h1>
+        <p class="payment-success-message">Votre transaction a été effectuée avec succès. Nous vous remercions pour votre confiance.</p>
+    </div>
+{% endblock %}

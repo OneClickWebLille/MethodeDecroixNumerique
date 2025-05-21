@@ -1,0 +1,212 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nous Contacter{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        .contact-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2.5rem;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .contact-title {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: 600;
+            font-size: 2.2rem;
+        }
+
+        .contact-subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 3rem;
+            font-size: 1.1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.8rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #34495e;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            outline: none;
+        }
+
+        textarea.form-control {
+            min-height: 180px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1.5rem;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #2980b9, #3498db);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(41, 128, 185, 0.3);
+        }
+
+        .contact-info {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #eee;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            color: #34495e;
+        }
+
+        .info-icon {
+            margin-right: 1rem;
+            color: #3498db;
+            font-size: 1.2rem;
+            width: 30px;
+            text-align: center;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Validation styles */
+        .is-invalid {
+            border-color: #e74c3c !important;
+        }
+
+        .invalid-feedback {
+            color: #e74c3c;
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+            display: block;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    {% include 'include/navbar.html.twig' %}
+
+    <div class="contact-container">
+        <h1 class="contact-title">Nous Contacter</h1>
+        <p class="contact-subtitle">Une question, une suggestion ? Laissez-nous un message</p>
+
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
+        {% for message in app.flashes('danger') %}
+            <div class="alert alert-danger">
+                {{ message }}
+            </div>
+        {% endfor %}
+        {% for message in app.flashes('warning') %}
+            <div class="alert alert-warning">
+                {{ message }}
+            </div>
+        {% endfor %}
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        {% if form is defined %}
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'data-turbo': 'false'}}) }}
+                <div class="form-group">
+                    {{ form_label(form.name, 'Votre nom', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.name, {'attr': {'class': 'form-control' ~ (form.name.vars.valid ? '' : ' is-invalid')}}) }}
+                    {{ form_errors(form.name) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(form.email, 'Votre email', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.email, {'attr': {'class': 'form-control' ~ (form.email.vars.valid ? '' : ' is-invalid')}}) }}
+                    {{ form_errors(form.email) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(form.subject, 'Sujet', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.subject, {'attr': {'class': 'form-control' ~ (form.subject.vars.valid ? '' : ' is-invalid')}}) }}
+                    {{ form_errors(form.subject) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(form.message, 'Votre message', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.message, {'attr': {'class': 'form-control' ~ (form.message.vars.valid ? '' : ' is-invalid'), 'rows': 8}}) }}
+                    {{ form_errors(form.message) }}
+                </div>
+
+                <button type="submit" class="submit-btn">Envoyer le message</button>
+            {{ form_end(form) }}
+        {% else %}
+            <div class="alert alert-danger">Le formulaire n'est pas disponible pour le moment. Veuillez réessayer plus tard.</div>
+        {% endif %}
+
+        <div class="contact-info">
+            <div class="info-item">
+                <div class="info-icon">📍</div>
+                <div>123 Rue Example, 75000 Paris, France</div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon">📞</div>
+                <div>+33 1 23 45 67 89</div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon">✉️</div>
+                <div>contact@monsite.com</div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

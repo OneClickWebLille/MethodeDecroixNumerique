@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer une organisation{% endblock %}
+
+{% block body %}
+    {% include 'include/navbar.html.twig' %}
+
+    <div class="container mt-4">
+        <h1>Créer une organisation</h1>
+
+        {{ form_start(form) }}
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

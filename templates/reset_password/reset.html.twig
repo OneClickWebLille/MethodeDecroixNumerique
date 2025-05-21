@@ -1,0 +1,92 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Réinitialisation du mot de passe{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <h1 class="h4 mb-4 font-weight-normal text-center">Nouveau mot de passe</h1>
+
+                        {{ form_start(resetForm, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+
+                        <div class="mb-3">
+                            {{ form_label(resetForm.plainPassword.first, null, {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(resetForm.plainPassword.first, {'attr': {'class': 'form-control'}}) }}
+                            <div class="invalid-feedback">
+                                {{ form_errors(resetForm.plainPassword.first) }}
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            {{ form_label(resetForm.plainPassword.second, null, {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(resetForm.plainPassword.second, {'attr': {'class': 'form-control'}}) }}
+                            <div class="invalid-feedback">
+                                {{ form_errors(resetForm.plainPassword.second) }}
+                            </div>
+                            <small class="text-muted">
+                                Le mot de passe doit contenir au moins 8 caractères.
+                            </small>
+                        </div>
+
+                        <button class="btn btn-primary w-100 py-2 mb-3" type="submit">
+                            <i class="bi bi-key"></i> Réinitialiser
+                        </button>
+
+                        <div class="text-center">
+                            <a href="{{ path('app_login') }}" class="text-decoration-none">
+                                <i class="bi bi-arrow-left"></i> Retour à la connexion
+                            </a>
+                        </div>
+
+                        {{ form_end(resetForm) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .password-strength {
+            height: 5px;
+            margin-top: 5px;
+            background: #e9ecef;
+        }
+        .password-strength-bar {
+            height: 100%;
+            width: 0;
+            transition: width 0.3s;
+        }
+    </style>
+
+    <script>
+        // Script optionnel pour afficher la force du mot de passe
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordInput = document.querySelector('#{{ resetForm.plainPassword.first.vars.id }}');
+            if (passwordInput) {
+                const strengthBar = document.createElement('div');
+                strengthBar.className = 'password-strength';
+                strengthBar.innerHTML = '<div class="password-strength-bar"></div>';
+                passwordInput.parentNode.insertBefore(strengthBar, passwordInput.nextSibling);
+
+                passwordInput.addEventListener('input', function() {
+                    const strength = calculatePasswordStrength(this.value);
+                    const bar = strengthBar.querySelector('.password-strength-bar');
+                    bar.style.width = strength + '%';
+                    bar.style.background = strength < 50 ? '#dc3545' : strength < 75 ? '#ffc107' : '#28a745';
+                });
+            }
+
+            function calculatePasswordStrength(password) {
+                let strength = 0;
+                if (password.length > 0) strength += Math.min(password.length * 5, 30);
+                if (password.match(/[A-Z]/)) strength += 15;
+                if (password.match(/[0-9]/)) strength += 20;
+                if (password.match(/[^A-Za-z0-9]/)) strength += 25;
+                return Math.min(strength, 100);
+            }
+        });
+    </script>
+{% endblock %}

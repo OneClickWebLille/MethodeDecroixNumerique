@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <title>Votre compte a été créé</title>
+    </head>
+    <body>
+        <h1>Bienvenue, {{ user.prenom }} {{ user.nom }} !</h1>
+        <p>Votre compte a été créé avec succès pour l'organisation {{ user.organisation.nom }}.</p>
+        <p>Voici vos informations de connexion :</p>
+        <ul>
+            <li><strong>Email :</strong> {{ user.email }}</li>
+            <li><strong>Mot de passe temporaire :</strong> {{ password }}</li>
+        </ul>
+        <p>Nous vous recommandons de changer votre mot de passe dès votre première connexion.</p>
+        <p>Pour vous connecter, cliquez sur le lien suivant :</p>
+        <p><a href="{{ url('app_login') }}">Se connecter</a></p>
+        <p>Merci,</p>
+        <p>L'équipe de La Méthode Decroix</p>
+    </body>
+</html>

@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gérer les organisations{% endblock %}
+
+{% block body %}
+    {% include 'include/navbar.html.twig' %}
+
+    <div class="container mt-4">
+        <h1>Gérer les organisations</h1>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Licences</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for organisation in organisations %}
+                    <tr>
+                        <td>{{ organisation.id }}</td>
+                        <td>{{ organisation.nom }}</td>
+                        <td>{{ organisation.licences }}</td>
+                        <td>
+{#                            <a href="{{ path('app_organisation_edit', { id: organisation.id }) }}" class="btn btn-warning">Modifier</a>#}
+{#                            <a href="{{ path('app_organisation_delete', { id: organisation.id }) }}" class="btn btn-danger">Supprimer</a>#}
+                            A décider
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

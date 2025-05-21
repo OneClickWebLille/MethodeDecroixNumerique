@@ -1,0 +1,12 @@
+Bonjour,
+
+Vous avez demandé à réinitialiser votre mot de passe. Veuillez visiter le lien suivant :
+
+{{ url('app_reset_password', {token: resetToken.token}) }}
+
+Ce lien expirera dans {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.
+
+Si vous n'avez pas fait cette demande, vous pouvez ignorer cet email.
+
+Cordialement,
+La Méthode Decroix

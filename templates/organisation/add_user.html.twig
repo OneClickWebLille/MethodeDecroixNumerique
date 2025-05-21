@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter un utilisateur{% endblock %}
+
+{% block body %}
+    {% include 'include/navbar.html.twig' %}
+
+    {% if(can_add_user == true) %}
+        {% if(has_licence == true) %}
+            <h1>Ajouter un utilisateur</h1>
+
+            {{ form_start(form) }}
+            {{ form_row(form.prenom, {'label': 'Prénom'}) }}
+            {{ form_row(form.nom, {'label': 'Nom'}) }}
+            {{ form_row(form.email, {'label': 'Email'}) }}
+            <button class="btn btn-primary">Ajouter</button>
+            {{ form_end(form) }}
+        {% else %}
+            <div class="alert alert-danger">
+                Vous devez avoir une licence valide pour ajouter un utilisateur.
+            </div>
+            <a href="{{ path('app_add_licences') }}" class="btn btn-primary">Acheter des licences</a>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-danger">
+            Vous n'avez pas les droits nécessaires pour ajouter un utilisateur.
+        </div>
+    {% endif %}
+{% endblock %}

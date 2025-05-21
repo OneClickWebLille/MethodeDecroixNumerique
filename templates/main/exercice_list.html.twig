@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des exercices{% endblock %}
+
+{% block body %}
+    {% include 'include/navbar.html.twig' %}
+
+    <div class="container">
+        {% for exercice in exercices %}
+            <div class="card mb-3">
+                <div class="card-header">{{ exercice.nom }}</div>
+                <div class="card-body">
+                    <p class="card-text">Description: {{ exercice.description }}</p>
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between gap-2">
+                        <a class="w-100" href="{{ path('app_exercice_edit', {'id': exercice.id}) }}">
+                            <button class="btn btn-primary w-100">
+                                Modifier
+                            </button>
+                        </a>
+                        <a class="w-100" href="{{ path('app_exercice', {'id': exercice.id}) }}">
+                            <button class="btn btn-primary w-100">
+                                Voir
+                            </button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}
